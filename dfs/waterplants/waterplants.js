@@ -61,70 +61,83 @@ function checkWaterPath(pot) {
     let visited = {};
     let unvisitedRooms = [];
     let adj = loadAdjList(pot);
-    dfs([[0][0]], pot, visited, unvisitedRooms)
+    console.log({ adj })
+    dfs([[0][0]], pot, visited, unvisitedRooms, adj)
     return waterReachesBottom;
 }
 
-function loadAdjList(pot) {
-    let adj = {};
-    for (let hall; hall < pot.length; hall++) {
-        for (let room; room < pot[0].length; room++) {
+function loadAdjList(map) {
+    let adj = [[]];
+    for (let hall = 0; hall < map.length; hall++) {
+        adj[hall] = [];
+        for (let room = 0; room < map[0].length; room++) {
+            adj[hall][room] = [];
             let d, l, r, u;
-            function checkBoundary(map, hall, room) {
-                return map[hall, room];
+            let borders = {
+                l: 0,
+                r: map[0].length - 1,
+                u: 0,
+                d: map.length - 1
             }
-            d = [map[hall + 1, room] ?? [hall, room]];
-            u = [map[hall - 1, room] ?? [hall, room]];
-            r = [map[hall, room + 1] ?? [hall, room]];
-            l = [map[hall, room - 1] ?? [hall, room]];
+            d = hall < borders.d ? [hall + 1, room] : [hall, room];
+            u = hall > borders.u ? [hall - 1, room] : [hall, room];
+            r = room < borders.r ? [hall, room + 1] : [hall, room];
+            l = room > borders.l ? [hall, room - 1] : [hall, room];
             let doors = [d, l, r, u];
-            let unlockedDoors = doors.filter((door) => pot[door[0]][door[1]] === 0);
+            let unlockedDoors = doors.filter(
+                (door) => map[door[0]][door[1]] === 0);
             adj[hall][room] = unlockedDoors;
         }
     }
     return adj;
 }
 
-function dfs(startingNode, grid, visited, q) {
+function dfs(startingNode, grid, visited, q, adj) {
     q.push(startingNode);
     while (q.length > 0) {
         let [hall, room] = q[q.length - 1];
         q.pop();
-        if (visited[hall][room]) {
-            continue;
-        }
+        if (visited[hall][room]) continue;
         if (hall === grid[0].length - 1) {
             waterReachesBottom = true;
             break;
         }
-        let newDoorsToExplore = unlockedDoors(map, hall, room);
+        // let newDoorsToExplore = unlockedDoors(adjDoors(map, hall, room));
+        let newDoorsToExplore = adj[hall][room];
         q.push(...newDoorsToExplore);
         visited[hall][room] = true;
     }
 }
 
-const adjDoors = (map, hall, room) => [
-    [map[hall - 1, room] ?? [hall, room]],
-    [map[hall, room - 1] ?? [hall, room]],
-    [map[hall, room + 1] ?? [hall, room]],
-    [map[hall + 1, room] ?? [hall, room]],
-]
-
-let [d, l, r, u] = (map, hall, room) => [
-    [map[hall - 1, room] ?? [hall, room]],
-    [map[hall, room - 1] ?? [hall, room]],
-    [map[hall, room + 1] ?? [hall, room]],
-    [map[hall + 1, room] ?? [hall, room]],
-]
-const unlockedDoors = (map, hall, room) => {
-    let d = [map[hall - 1, room] ?? [hall, room]];
-    let l = [map[hall, room - 1] ?? [hall, room]];
-    let r = [map[hall, room + 1] ?? [hall, room]];
-    let u = [map[hall + 1, room] ?? [hall, room]];
+const adjDoors = (map, hall, room) => {
+    let d, l, r, u;
+    let borders = {
+        l: 0,
+        r: map[0].length - 1,
+        u: 0,
+        d: map.length - 1
+    }
     return [
-        d,
-        l,
-        r,
-        u,
-    ].filter(([hallNumber, doorNumber]) => map[hallNumber][doorNumber] === 0);
+        d = hall < borders.d ? [hall + 1, room] : [hall, room],
+        u = hall > borders.u ? [hall - 1, room] : [hall, room],
+        r = room < borders.r ? [hall, room + 1] : [hall, room],
+        l = room > borders.l ? [hall, room - 1] : [hall, room]
+    ]
 }
+
+// const unlockedDoors = (map, hall, room) => {
+//     let borders = {
+//         d: map.length - 1,
+//         l: 0,
+//         r: map[0].length - 1,
+//         u: 0,
+//     }
+//     return [
+//         d = hall < borders.d ? [hall + 1, room] : [hall, room],
+//         l = room > borders.l ? [hall, room - 1] : [hall, room],
+//         r = room < borders.r ? [hall, room + 1] : [hall, room],
+//         u = hall > borders.u ? [hall - 1, room] : [hall, room],
+//     ].filter(([hallNumber, doorNumber]) => map[hallNumber][doorNumber] === 0);
+// }
+const unlockedDoors = adjDoors =>
+    adjDoors.filter(([hallNumber, doorNumber]) => map[hallNumber][doorNumber] === 0);
