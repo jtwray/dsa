@@ -86,12 +86,11 @@ function loadAdjList(pot) {
 }
 
 function dfs(startingNode, grid, visited, q) {
-    let [hall, room] = startingNode;
-    q.push([hall, room]);
+    q.push(startingNode);
     while (q.length > 0) {
-        let curr = q[q.length - 1];
+        let [hall, room] = q[q.length - 1];
         q.pop();
-        let [hall, room] = curr; if (visited[hall][room]) {
+        if (visited[hall][room]) {
             continue;
         }
         if (hall === grid[0].length - 1) {
