@@ -1,0 +1,32 @@
+{
+  "name": "algos",
+  "version": "1.0.0",
+  "description": "practicing dynamic and graph algothms for DSA skillpoints levelup",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jtwray/dsa.git"
+  },
+  "keywords": [
+    "DSA",
+    "GRAPH",
+    "DFS",
+    "BFS",
+    "DYNAMIC",
+    "BOTTOMUP",
+    "RESCURSIVE",
+    "ITERATIVE",
+    "JAVASCRIPT",
+    "NODE",
+    "LEVELUP"
+  ],
+  "author": "tucker wray / jtwray",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jtwray/dsa/issues"
+  },
+  "homepage": "https://github.com/jtwray/dsa#readme"
+}
