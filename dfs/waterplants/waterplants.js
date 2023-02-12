@@ -1,17 +1,17 @@
 const pot1 =
     [[0, 1, 0, 1],
-    [1, 0, 0, 1],
-    [1, 1, 0, 0]]
+    [0, 0, 0, 1],
+    [0, 1, 0, 0]]
 
 const pot2 =
     [[0, 1, 0, 1],
     [1, 0, 0, 1],
-    [1, 1, 0, 0]]
+    [1, 1, 1, 0]]
 
 const pot3 =
     [[0, 1, 0, 1],
     [1, 0, 0, 1],
-    [1, 1, 0, 0]]
+    [1, 1, 0, 1]]
 
 function isPathThruForH2O(pot) {
     const visited = {};
@@ -58,11 +58,12 @@ function isPathThruForH2O(pot) {
 
 function checkWaterPath(pot) {
     let waterReachesBottom = false;
-    let visited = {};
+    let visited = pot.map(hall => hall.map(room => room = false));
     let unvisitedRooms = [];
     let adj = loadAdjList(pot);
-    console.log({ adj })
-    dfs([[0][0]], pot, visited, unvisitedRooms, adj)
+    // console.log({ adj })
+    dfs([0, 0], pot, visited, unvisitedRooms, adj)
+    console.log({ waterReachesBottom });
     return waterReachesBottom;
 }
 
@@ -92,21 +93,31 @@ function loadAdjList(map) {
     return adj;
 }
 
-function dfs(startingNode, grid, visited, q, adj) {
+function dfs(startingNode, map, visited, q, adj) {
+    let waterReachesBottom = false;
     q.push(startingNode);
+    const path = [];
+    // console.log({startingNode, map, visited, q, adj},)
     while (q.length > 0) {
         let [hall, room] = q[q.length - 1];
         q.pop();
-        if (visited[hall][room]) continue;
-        if (hall === grid[0].length - 1) {
-            waterReachesBottom = true;
-            break;
+        path.push(`${hall + '-' + room}`)
+        console.log({ hall, room, path, q })
+        if (visited[hall][room] === true) {
+            // console.log(visited[hall][room],visited);
+            continue;
         }
-        // let newDoorsToExplore = unlockedDoors(adjDoors(map, hall, room));
-        let newDoorsToExplore = adj[hall][room];
-        q.push(...newDoorsToExplore);
+        if (hall === map.length - 1) {
+            waterReachesBottom = true; break;
+
+        }
+        let newDoorsToExplore = adjDoors(map, hall, room)
+        // let newDoorsToExplore = adj[hall][room];
+        newDoorsToExplore.forEach(newDoor => q.push(newDoor));
+        // q.push(...newDoorsToExplore);
         visited[hall][room] = true;
     }
+    return waterReachesBottom;
 }
 
 const adjDoors = (map, hall, room) => {
@@ -122,7 +133,7 @@ const adjDoors = (map, hall, room) => {
         u = hall > borders.u ? [hall - 1, room] : [hall, room],
         r = room < borders.r ? [hall, room + 1] : [hall, room],
         l = room > borders.l ? [hall, room - 1] : [hall, room]
-    ]
+    ].filter(([hallNumber, doorNumber]) => map[hallNumber] && map[hallNumber][doorNumber] === 0)
 }
 
 // const unlockedDoors = (map, hall, room) => {
@@ -139,5 +150,18 @@ const adjDoors = (map, hall, room) => {
 //         u = hall > borders.u ? [hall - 1, room] : [hall, room],
 //     ].filter(([hallNumber, doorNumber]) => map[hallNumber][doorNumber] === 0);
 // }
-const unlockedDoors = adjDoors =>
-    adjDoors.filter(([hallNumber, doorNumber]) => map[hallNumber][doorNumber] === 0);
+const unlockedDoors = (map, adjDoors) =>
+    adjDoors.filter(([hallNumber, doorNumber]) => map[hallNumber] && map[hallNumber][doorNumber] === 0);
+
+function timeMethodPerf(cb, timesToRun = 1, nameThisTest = null) {
+    console.time(nameThisTest);
+    for (let i = 0; i < timesToRun; i++) { cb }
+    console.timeEnd(nameThisTest);
+};
+
+
+let t = timeMethodPerf;
+
+t(checkWaterPath(pot1), 1, 'pot1')
+t(checkWaterPath(pot3), 1, 'pot3')
+t(checkWaterPath(pot2), 1, 'pot2')
